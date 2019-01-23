@@ -284,6 +284,9 @@ def Placement(request):
     return render(request, 'placementModule/placement.html', context)
 
 
+
+
+
 @login_required
 def StudentRecords(request):
     user = request.user
@@ -446,23 +449,18 @@ def StudentRecords(request):
                 com = [comp.company_name, comp.placement_type]
                 notify = NotifyStudent.objects.get(company_name=com[0],
                                                    placement_type=com[1])
-                # if 'q' not in request.session:
-                #     stud = Student.objects.all()
-                # else:
-                #     q = request.session['q']
-                #     p = []
-                #     for w in q:
-                #         p.append(w['id_id'])
-                stud = Student.objects.filter(Q(id__in=ExtraInfo.objects.filter(Q(id__icontains='2016'))))
-                print(len(stud))
-                for student in stud:
-                    status = PlacementStatus.objects.create(notify_id=notify,
-                                                            unique_id=student,
-                                                            )
-                    status.save()
-
-
-
+                
+                if 'q' not in request.session:
+                    stud = Student.objects.all()
+                else:
+                    q = request.session['q']
+                    p = []
+                    for w in q:
+                        p.append(w['id_id'])
+                        # Q(id__in=ExtraInfo.objects.filter(Q(id__icontains='2016')))
+                        stud = Student.objects.filter(Q(id__in=p))
+                PlacementStatus.objects.bulk_create([PlacementStatus(notify_id=notify,
+                            unique_id=student,)for student in stud])
 
     context = {
         'form1': form1,
