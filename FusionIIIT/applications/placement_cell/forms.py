@@ -303,7 +303,7 @@ class AddSchedule(forms.Form):
     description = forms.CharField(widget=forms.Textarea(attrs={'max_length': 1000,
                                                           'class': 'form-control'}),
                                   label="description", required=False)
-    attached_file = forms.FileField()
+    attached_file = forms.FileField(required=False)
 
     placement_date = forms.DateField(label='placement_date', widget=forms.DateInput(attrs={'class':'schedule_datepicker'}))
 

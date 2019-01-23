@@ -205,7 +205,7 @@ class PlacementStatus(models.Model):
                                   default='PENDING')
     placed = models.CharField(max_length=20, choices=Constants.PLACED_TYPE,
                               default='NOT PLACED')
-    timestamp = models.DateTimeField(auto_now=False, auto_now_add=False, default=timezone.now)
+    timestamp = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = (('notify_id', 'unique_id'),)

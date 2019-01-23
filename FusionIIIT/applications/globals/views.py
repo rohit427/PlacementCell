@@ -723,10 +723,14 @@ def dashboard(request):
             if 'skillsubmit' in request.POST:
                 form = AddSkill(request.POST)
                 if form.is_valid():
-                    skill = form.cleaned_data['skill']
+                    skill = form.cleaned_data['skill'].upper()
+                    try:
+                      skill_obj = Skill.objects.get(skill=skill)
+                    except:
+                      skill_obj = Skill.objects.create(skill=skill)
                     skill_rating = form.cleaned_data['skill_rating']
                     has_obj = Has.objects.create(unique_id=student,
-                                                 skill_id=Skill.objects.get(skill=skill),
+                                                 skill_id=skill_obj,
                                                  skill_rating = skill_rating)
                     has_obj.save()
             if 'achievementsubmit' in request.POST:
