@@ -310,7 +310,7 @@ def StudentRecords(request):
             print('valid')
             if form1.cleaned_data['name']:
                 name = form1.cleaned_data['name']
-                
+
             else:
                 name = ''
             if form1.cleaned_data['rollno']:
@@ -441,26 +441,52 @@ def StudentRecords(request):
     if 'sendinvite' in request.POST:
         # invitecheck=1;
         print('send invitation coming')
+
         form13 = SendInvite(request.POST)
+
         if form13.is_valid():
             print('send invitation valid')
             if form13.cleaned_data['company']:
-                comp = form13.cleaned_data['company']
-                com = [comp.company_name, comp.placement_type]
-                notify = NotifyStudent.objects.get(company_name=com[0],
-                                                   placement_type=com[1])
-                
-                if 'q' not in request.session:
-                    stud = Student.objects.all()
+                print('valid')
+                if form13.cleaned_data['rollno']:
+                    rollno = form13.cleaned_data['rollno']
                 else:
-                    q = request.session['q']
-                    p = []
-                    for w in q:
-                        p.append(w['id_id'])
-                        # Q(id__in=ExtraInfo.objects.filter(id__icontains='2016'))
-                        stud = Student.objects.filter(id__in=p)
-                PlacementStatus.objects.bulk_create([PlacementStatus(notify_id=notify,
-                            unique_id=student,)for student in stud])
+                    rollno = ''
+
+                programme = form13.cleaned_data['programme']
+
+                if form13.cleaned_data['department']:
+                    department = form13.cleaned_data['department']
+                else:
+                    department = ''
+
+                if form13.cleaned_data['cpi']:
+                    cpi = form13.cleaned_data['cpi']
+                else:
+                    cpi = 0
+
+                comp = form13.cleaned_data['company']
+
+                notify = NotifyStudent.objects.get(company_name=comp.company_name,
+                                                   placement_type=comp.placement_type)
+
+                students = Student.objects.filter(
+                    Q(
+                        id__in = ExtraInfo.objects.filter(
+                            Q(
+                            department__in = DepartmentInfo.objects.filter(Q(name__icontains=department)),
+                            id__icontains = rollno
+                            )
+                        ),
+                        programme = programme,
+                        cpi__gte = cpi
+                    )
+                ).exclude(id__in = PlacementStatus.objects.filter(notify_id=notify).values_list('unique_id', flat=True))
+
+                print(len(students))
+
+                PlacementStatus.objects.bulk_create( [PlacementStatus(notify_id=notify,
+                            unique_id=student,)for student in students] )
 
     context = {
         'form1': form1,
@@ -474,6 +500,7 @@ def StudentRecords(request):
         'no_pagination': no_pagination,
         'is_disabled': is_disabled,
     }
+
     print('send invitation last checkpoint')
     return render(request, 'placementModule/studentrecords.html', context)
 
@@ -733,6 +760,7 @@ def ManageRecords(request):
 
     return render(request, 'placementModule/managerecords.html', context)
 
+
 @login_required
 def PlacementStatistics(request):
     user = request.user
@@ -787,7 +815,7 @@ def PlacementStatistics(request):
     hold_design = get_object_or_404(HoldsDesignation, working=user)
 
     current = HoldsDesignation.objects.filter(Q(working=user, designation__name="student"))
-    
+
     if len(current) == 0:
         current = None
 

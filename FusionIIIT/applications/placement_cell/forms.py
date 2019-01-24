@@ -273,6 +273,13 @@ class SendInvite(forms.Form):
             company - name of company
     """
     company = forms.ModelChoiceField(required=True, queryset=NotifyStudent.objects.all(), label="company")
+    rollno = forms.IntegerField(label="rollno", required=False)
+    programme = forms.ChoiceField(choices = Con.PROGRAMME, required=False,
+                                  label="programme", widget=forms.Select(attrs={'style': "height:45px"}))
+    department = forms.ChoiceField(choices = Constants.DEP, required=False,
+                                  label="department", widget=forms.Select(attrs={'style': "height:45px"}))
+    cpi = forms.DecimalField(label="cpi", required=False)
+
 
 
 class AddSchedule(forms.Form):
