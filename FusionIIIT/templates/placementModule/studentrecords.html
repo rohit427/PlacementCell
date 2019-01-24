@@ -348,7 +348,7 @@
                           {% endif %}
                         {% endfor %}
 
-                        
+
 
                         {% if students.has_next %}
                         <div class="disabled item">
@@ -439,7 +439,7 @@
                   </table>
                 {% endif %}
 
-          
+
             </div>
 
 
@@ -457,12 +457,43 @@
                         {{ form13.company }}
                       </div>
                 </div>
-                  <div class="field" >
-                      <button name="sendinvite" value="sendinvite" class="ui large primary button right floated" type="submit">
-                          Send
-                      </button>
+
+                <div class="three fields">
+                  <div class="field">
+                    {{ form13.programme.errors }}
+                      <label>
+                          Programme
+                      </label>
+                      {{ form13.programme }}
                   </div>
-                  <br><div class="row"></div><br>
+
+                  <div class="field">
+                    {{ form13.department.errors }}
+                      <label>
+                          Department
+                      </label>
+                      {{ form13.department }}
+                  </div>
+
+                  <div class="field">
+                    {{ form13.rollno.errors }}
+                      <label>Year or Roll Number</label>
+                      {{ form13.rollno }}
+                  </div>
+
+                  <div class="field">
+                    {{ form13.cpi.errors }}
+                      <label>Min. CPI</label>
+                      {{ form13.cpi }}
+                  </div>
+
+              </div>
+              <div class="field" >
+                  <button name="sendinvite" value="sendinvite" class="ui large primary button right floated" type="submit">
+                      Send
+                  </button>
+              </div>
+              <br><div class="row"></div><br>
               </form>
             </div>
 
