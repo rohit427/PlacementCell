@@ -210,39 +210,62 @@
 
                   {% if placementstatus %}
                     <br>
-                    <br>
+                    <!-- Pagination Section starts here  --->
+                    {% if no_pagination %}
+                      <center>
+                        <div class="ui pagination menu">
+                          {% if placementstatus.has_previous %}
+                          <a href="?page={{placementstatus.previous_page_number}}" class="item">
+                            Previous
+                          </a>
+                          {% endif %}
+
+                          {% if is_disabled %}
+                            <a href="?page=1" class="item">1</a>
+                            <div class="disabled item">
+                              ...
+                            </div>
+                          {% endif %}
+
+                          {% for i in page_range %}
+                            {% if placementstatus.number == i %}
+                              <a href="?page={{i}}" class="active item">{{ i }} </a>
+                            {% else %}
+                              <a href="?page={{ i }}" class="item">{{ i }}</a>
+                            {% endif %}
+                          {% endfor %}
+
+                          
+
+                          {% if placementstatus.has_next %}
+                          <div class="disabled item">
+                            ...
+                          </div>
+                          <a href="?page={{placementstatus.next_page_number}}" class="item">
+                            Next
+                          </a>
+                          {% endif %}
+                        </div>
+                      </center>
+                    {% endif %}
+                    <!-- Pagination Section ends here --->
+                    <br>   
                     <div class="ui divider"></div>
 
-                    <div class="ui pointing pagination menu">
-                      {% for student in placementstatus %}
-                        {% if forloop.counter0|divisibleby:10 %}
-                          <span align="right>">
-                            <a class="item {% if forloop.counter0 == 0 %}active{% endif %}" data-tab="student-{{ forloop.counter0 }}">
-                              {% widthratio forloop.counter|add:10 10 1 %}
-                            </a>
-                          </span>
-                        {% endif %}
-                      {% endfor %}
+                      <table class="ui very basic collapsing celled sortable table" style="margin: auto; padding-left: 32px; padding-right: 32px; overflow-y: auto;" id="student">
+                          <thead>
+                          <tr>
+                              <th class="four wide">Student</th>
+                              <th class="six wide">Company</th>
+                              <th class="two wide">CTC (LPA)</th>
+                              <th class="two wide">Invitation</th>
+                              <th class="two wide">Delete</th>
+                          </tr>
+                          </thead>
 
-                    </div>
-                    {% for student in placementstatus %}
-                      {% if forloop.counter0|divisibleby:10 %}
-                        <div class="ui {% if forloop.counter0 == 0 %}active {% endif %} tab segment" data-tab="student-{{ forloop.counter0 }}">
-
-                          <table class="ui very basic collapsing celled sortable table" style="margin: auto; padding-left: 32px; padding-right: 32px; overflow-y: auto;" id="student">
-                              <thead>
-                              <tr>
-                                  <th class="four wide">Student</th>
-                                  <th class="six wide">Company</th>
-                                  <th class="two wide">CTC (LPA)</th>
-                                  <th class="two wide">Invitation</th>
-                                  <th class="two wide">Delete</th>
-                              </tr>
-                              </thead>
-
-                              <tbody>
-                              {% endif %}
-                                {% if student.notify_id.placement_type == 'PLACEMENT' %}
+                          <tbody>
+                            {% for student in placementstatus %}
+                              {% if student.notify_id.placement_type == 'PLACEMENT' %}
                               <tr>
                                   <td>
                                       <h4 class="ui image header">
@@ -278,17 +301,9 @@
                                   </td>
                               </tr>
                               {% endif %}
-                              {% if forloop.counter0|add:1|divisibleby:10 %}
-                              </tbody>
-                          </table>
-                        </div>
-                      {% endif %}
-                    {% endfor %}
-                    {% if not placementstatus.all.count|divisibleby:10 %}
-                     </tbody>
-                        </table>
-                            </div>
-                    {% endif %}
+                            {% endfor %}
+                          </tbody>
+                      </table>
                   {% endif %}
 
               </div>
@@ -369,92 +384,103 @@
                 </form>
 
                 {% if placementstatus %}
-                <br>
-                <br>
-                <div class="ui divider"></div>
-
-                <div class="ui pointing pagination menu">
-                            {% for student in placementstatus %}
-                           {% if forloop.counter0|divisibleby:10 %}
-                               <span align="right>"><a class="{% if forloop.counter0 == 0 %}active {% endif %}item" data-tab="student-{{ forloop.counter0 }}">
-                                   {% widthratio forloop.counter|add:10 10 1 %}
-                </a></span>
-                           {% endif %}
-                           {% endfor %}
-
-                </div>
-                  {% for student in placementstatus %}
-
-                       {% if forloop.counter0|divisibleby:10 %}
-                          <div class="ui {% if forloop.counter0 == 0 %}active {% endif %} tab segment" data-tab="student-{{ forloop.counter0 }}">
-
-
-                            <table class="ui very basic collapsing celled sortable table" style="margin: auto; padding-left: 32px; padding-right: 32px; overflow-y: auto;" id="student">
-                                <thead>
-                                <tr>
-                                  <th class="four wide">Student</th>
-                                  <th class="six wide">Company</th>
-                                  <th class="two wide">CTC (LPA)</th>
-                                  <th class="two wide">Invitation</th>
-                                  <th class="two wide">Delete</th>
-                                </tr>
-                                </thead>
-
-                                <tbody>
-                                  {% endif %}
-                                  {% if student.notify_id.placement_type == 'PBI' %}
-                                <tr>
-                                    <td>
-                                        <h4 class="ui image header">
-
-                                            <div class="content">
-                                              {{ student.unique_id.id.user.first_name }} {{ student.unique_id.id.user.last_name }}
-                                                <div class="sub header">
-                                                  {{ student.unique_id.id.id }}
-                                                </div>
-                                            </div>
-                                        </h4>
-                                    </td>
-
-                                    <td>
-                                        {{ student.notify_id.company_name }}
-                                    </td>
-
-                                    <td>
-                                       {{ student.notify_id.ctc }}
-                                    </td>
-
-                                    <td>
-                                        {{ student.invitation }}
-                                    </td>
-
-                                    <td>
-                                      <form method="post" class="ui form" role="form">
-                                        {% csrf_token %}
-                                        <button name="deleteinvite" value="{{ student.pk }}" class="ui inverted huge circular icon button" style="margin: auto;">
-                                            <i class="delete red icon"></i>
-                                        </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                {% endif %}
-                                {% if forloop.counter0|add:1|divisibleby:10 %}
-                                </tbody>
-                            </table>
-                          </div>
-
+                  <br>
+                  <!-- Pagination Section starts here  --->
+                  {% if no_pagination %}
+                    <center>
+                      <div class="ui pagination menu">
+                        {% if placementstatus.has_previous %}
+                        <a href="?pbi_page={{placementstatus.previous_page_number}}" class="item">
+                          Previous
+                        </a>
                         {% endif %}
-                  {% endfor %}
 
-            {% if not placementstatus.all.count|divisibleby:10 %}
-            </tbody>
-              </table>
-                  </div>
-            {% endif %}
+                        {% if is_disabled %}
+                          <a href="?pbi_page=1" class="item">1</a>
+                          <div class="disabled item">
+                            ...
+                          </div>
+                        {% endif %}
 
-            {% endif %}
+                        {% for i in page_range %}
+                          {% if placementstatus.number == i %}
+                            <a href="?pbi_page={{i}}" class="active item">{{ i }} </a>
+                          {% else %}
+                            <a href="?pbi_page={{ i }}" class="item">{{ i }}</a>
+                          {% endif %}
+                        {% endfor %}
 
-              </div>
+                        
+
+                        {% if placementstatus.has_next %}
+                        <div class="disabled item">
+                          ...
+                        </div>
+                        <a href="?pbi_page={{placementstatus.next_page_number}}" class="item">
+                          Next
+                        </a>
+                        {% endif %}
+                      </div>
+                    </center>
+                  {% endif %}
+                  <!-- Pagination Section ends here --->
+                  <br>
+
+                  <div class="ui divider"></div>         
+                    <table class="ui very basic collapsing celled sortable table" style="margin: auto; padding-left: 32px; padding-right: 32px; overflow-y: auto;" id="student">
+                        <thead>
+                        <tr>
+                          <th class="four wide">Student</th>
+                          <th class="six wide">Company</th>
+                          <th class="two wide">CTC (LPA)</th>
+                          <th class="two wide">Invitation</th>
+                          <th class="two wide">Delete</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {% for student in placementstatus %}
+                          {% if student.notify_id.placement_type == 'PBI' %}
+                          <tr>
+                            <td>
+                                <h4 class="ui image header">
+
+                                    <div class="content">
+                                      {{ student.unique_id.id.user.first_name }} {{ student.unique_id.id.user.last_name }}
+                                        <div class="sub header">
+                                          {{ student.unique_id.id.id }}
+                                        </div>
+                                    </div>
+                                </h4>
+                            </td>
+
+                            <td>
+                                {{ student.notify_id.company_name }}
+                            </td>
+
+                            <td>
+                               {{ student.notify_id.ctc }}
+                            </td>
+
+                            <td>
+                                {{ student.invitation }}
+                            </td>
+
+                            <td>
+                              <form method="post" class="ui form" role="form">
+                                {% csrf_token %}
+                                <button name="deleteinvite" value="{{ student.pk }}" class="ui inverted huge circular icon button" style="margin: auto;">
+                                    <i class="delete red icon"></i>
+                                </button>
+                                </form>
+                            </td>
+                          </tr>
+                          {% endif %}
+                        {% endfor %}
+                        </tbody>
+                    </table>
+
+              {% endif %}
           </div>
         </div>
         {% comment %}The central-rail segment ends here!{% endcomment %}
