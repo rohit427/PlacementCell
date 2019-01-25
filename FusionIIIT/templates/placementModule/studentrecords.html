@@ -323,12 +323,21 @@
                     </div>
                     {% comment %}The add a new skill Accordian ends here!{% endcomment %}
                 </form>
+
                 {% comment %}Form Tag ends here!{% endcomment %}
 
                 {% if students %}
 
+                  <!-- generate pdf button  --->
+                  <form method="post" target="_blank" action="{% url 'placement:student_records' %}" class="ui form" role="form">
+                    {% csrf_token %}
+                    <button name="pdf_gen_std_record" value="pdf_gen_std_record" class="ui large positive button right floated" type="submit">
+                    Generate PDF
+                  </button></form>
+
                   <!-- Pagination Section starts here  --->
                   {% if no_pagination %}
+
                     <center>
                       <div class="ui pagination menu">
                         {% if students.has_previous %}
