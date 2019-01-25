@@ -437,6 +437,34 @@ def StudentRecords(request):
                 sr.debar = "NOT DEBAR"
                 sr.save()
 
+    if 'pdf_gen_std_record' in request.POST:
+        print('coming--generate--pdf')
+
+        name = request.session['name']
+        rollno = request.session['rollno']
+        programme = request.session['programme']
+        department = request.session['department']
+        cpi =  int(request.session['cpi'])
+        debar = request.session['debar']
+        placed_type = request.session['placed_type']
+
+        students = Student.objects.filter(
+            Q(id__in=ExtraInfo.objects.filter(Q(
+            user__in=User.objects.filter(Q(first_name__icontains=name)),
+            department__in=DepartmentInfo.objects.filter(Q(name__icontains=department)),
+            id__icontains=rollno)),
+            programme=programme,
+            cpi__gte=cpi)).filter(Q(pk__in=StudentPlacement.objects.filter(
+                Q(debar=debar, placed_type=placed_type)).values('unique_id_id'))).order_by('id')
+
+        context = {
+            'students' : students
+        }
+
+        print('rendering the pdf--student record')
+        return render_to_pdf('placementModule/pdf_student_record.html', context)
+
+
     # invitecheck=0;
     if 'sendinvite' in request.POST:
         # invitecheck=1;
