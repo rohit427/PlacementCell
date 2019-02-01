@@ -15,31 +15,36 @@ class Constants:
         ('ONGOING', 'Ongoing'),
         ('COMPLETED', 'Completed'),
     )
+
     ACHIEVEMENT_TYPE = (
         ('EDUCATIONAL', 'Educational'),
         ('OTHER', 'Other'),
     )
+
     INVITATION_TYPE = (
         ('ACCEPTED', 'Accepted'),
         ('REJECTED', 'Rejected'),
         ('PENDING', 'Pending'),
     )
+
     PLACEMENT_TYPE = (
         ('PLACEMENT', 'Placement'),
         ('PBI', 'PBI'),
         ('HIGHER STUDIES', 'Higher Studies'),
         ('OTHER', 'Other'),
     )
+
     PLACED_TYPE = (
         ('NOT PLACED', 'Not Placed'),
         ('PLACED', 'Placed'),
     )
+
     DEBAR_TYPE = (
         ('NOT DEBAR', 'Not Debar'),
         ('DEBAR', 'Debar'),
     )
+
     DEP = (
-        ('',''),
         ('CSE', 'CSE'),
         ('ME','ME'),
         ('ECE','ECE')

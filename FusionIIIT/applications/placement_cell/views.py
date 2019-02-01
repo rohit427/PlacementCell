@@ -2,6 +2,7 @@ import os
 import shutil
 import decimal
 import zipfile
+import xlwt
 from cgi import escape
 from datetime import date
 from io import BytesIO
@@ -340,7 +341,7 @@ def StudentRecords(request):
             students = Student.objects.filter(
                 Q(id__in=ExtraInfo.objects.filter(Q(
                 user__in=User.objects.filter(Q(first_name__icontains=name)),
-                department__in=DepartmentInfo.objects.filter(Q(name__icontains=department)),
+                department__in=DepartmentInfo.objects.filter(Q(name__in=department)),
                 id__icontains=rollno)),
                 programme=programme,
                 cpi__gte=cpi)).filter(Q(pk__in=StudentPlacement.objects.filter(
@@ -451,7 +452,7 @@ def StudentRecords(request):
         students = Student.objects.filter(
             Q(id__in=ExtraInfo.objects.filter(Q(
             user__in=User.objects.filter(Q(first_name__icontains=name)),
-            department__in=DepartmentInfo.objects.filter(Q(name__icontains=department)),
+            department__in=DepartmentInfo.objects.filter(Q(name__in=department)),
             id__icontains=rollno)),
             programme=programme,
             cpi__gte=cpi)).filter(Q(pk__in=StudentPlacement.objects.filter(
@@ -462,7 +463,36 @@ def StudentRecords(request):
         }
 
         print('rendering the pdf--student record')
+
         return render_to_pdf('placementModule/pdf_student_record.html', context)
+
+    if 'excel_gen_std_record' in request.POST:
+        print('coming--generate--excel')
+
+        name = request.session['name']
+        rollno = request.session['rollno']
+        programme = request.session['programme']
+        department = request.session['department']
+        cpi =  int(request.session['cpi'])
+        debar = request.session['debar']
+        placed_type = request.session['placed_type']
+
+        students = Student.objects.filter(
+            Q(id__in=ExtraInfo.objects.filter(Q(
+            user__in=User.objects.filter(Q(first_name__icontains=name)),
+            department__in=DepartmentInfo.objects.filter(Q(name__in=department)),
+            id__icontains=rollno)),
+            programme=programme,
+            cpi__gte=cpi)).filter(Q(pk__in=StudentPlacement.objects.filter(
+                Q(debar=debar, placed_type=placed_type)).values('unique_id_id'))).order_by('id')
+
+        context = {
+            'students' : students
+        }
+
+        print('rendering the excel--student record')
+
+        return export_to_xls(students)
 
 
     # invitecheck=0;
@@ -502,7 +532,7 @@ def StudentRecords(request):
                     Q(
                         id__in = ExtraInfo.objects.filter(
                             Q(
-                            department__in = DepartmentInfo.objects.filter(Q(name__icontains=department)),
+                            department__in = DepartmentInfo.objects.filter(Q(name__in=department)),
                             id__icontains = rollno
                             )
                         ),
@@ -1063,6 +1093,56 @@ def PlacementStatistics(request):
 
     return render(request, 'placementModule/placementstatistics.html', context)
 
+
+
+
+
+
+
+def export_to_xls(qs):
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="report.xls"'
+
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('Report')
+
+    # Sheet header, first row
+    row_num = 0
+
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+
+    columns = ['Roll No.', 'Name', 'CPI', 'Department', 'Discipline', 'Placed', 'Debarred' ]
+
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+
+    # Sheet body, remaining rows
+    font_style = xlwt.XFStyle()
+
+    for student in qs:
+        row_num += 1
+
+        row = []
+        row.append(student.id.id)
+        row.append(student.id.user.first_name+' '+student.id.user.last_name)
+        row.append(student.cpi)
+        row.append(student.programme)
+        row.append(student.id.department.name)
+        if student.studentplacement.placed_type == "PLACED":
+            row.append('Yes')
+        else:
+            row.append('No')
+        if student.studentplacement.placed_type == "DEBAR":
+            row.append('Yes')
+        else:
+            row.append('No')
+
+        for col_num in range(len(row)):
+            ws.write(row_num, col_num, row[col_num], font_style)
+
+    wb.save(response)
+    return response
 
 
 # @login_required

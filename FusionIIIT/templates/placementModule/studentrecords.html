@@ -327,8 +327,15 @@
                   <!-- generate pdf button  --->
                   <form method="post" target="_blank" action="{% url 'placement:student_records' %}" class="ui form" role="form">
                     {% csrf_token %}
-                    <button name="pdf_gen_std_record" value="pdf_gen_std_record" class="ui large positive button right floated" type="submit">
-                    Generate PDF
+                    <button name="pdf_gen_std_record" value="pdf_gen_std_record" class="ui medium positive button right floated" type="submit">
+                    PDF
+                  </button></form>
+
+                  <!-- generate ms-excel button  --->
+                  <form method="post" target="_blank" action="{% url 'placement:student_records' %}" class="ui form" role="form">
+                    {% csrf_token %}
+                    <button name="excel_gen_std_record" value="excel_gen_std_record" class="ui medium positive button right floated" type="submit">
+                    Excel Sheet
                   </button></form>
 
                   <!-- Pagination Section starts here  --->
