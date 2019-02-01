@@ -409,10 +409,12 @@ def InvitationStatus(request):
 
 
     if 'studentpbisearchsubmit' in request.POST:
+        print('pbi')
         mnpbi_tab = 1
         mnpbi_post = 1
         form = ManagePbiRecord(request.POST)
         if form.is_valid():
+            print(form.cleaned_data['company'])
             if form.cleaned_data['stuname']:
                 stuname = form.cleaned_data['stuname']
             else:
@@ -433,22 +435,27 @@ def InvitationStatus(request):
             request.session['mn_pbi_ctc'] = ctc
             request.session['mn_pbi_cname'] = cname
             request.session['mn_pbi_rollno'] = rollno
-            placementstatus = PlacementStatus.objects.filter(Q(notify_id__in=NotifyStudent.objects.filter
-                                                       (Q(placement_type="PBI",
-                                                          company_name__icontains=cname,
-                                                          ctc__gte=ctc)),
-                                                       unique_id__in=Student.objects.filter
-                                                       ((Q(id__in=ExtraInfo.objects.filter
-                                                           (Q(user__in=User.objects.filter
-                                                              (Q(first_name__icontains=stuname)),
-                                                              id__icontains=rollno))
-                                                           )))))
+            placementstatus = PlacementStatus.objects.filter(
+                Q(notify_id__in=NotifyStudent.objects.filter(
+                Q(placement_type="PBI",
+                company_name__icontains=cname,
+                ctc__gte=ctc)),
+                unique_id__in=Student.objects.filter(
+                (Q(id__in=ExtraInfo.objects.filter(
+                Q(user__in=User.objects.filter(
+                Q(first_name__icontains=stuname)),
+                id__icontains=rollno))))))).order_by('id')
+
             total_query = placementstatus.count()
+            print(total_query)
 
             if total_query > 30:
                 no_pagination = 1
+                print(placementstatus)
                 paginator = Paginator(placementstatus, 30)
+                print(paginator)
                 page = request.GET.get('pbi_page', 1)
+                print(page)
                 placementstatus = paginator.page(page)
                 page = int(page)
                 total_page = int(page + 3)
